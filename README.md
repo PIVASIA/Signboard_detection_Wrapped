@@ -2,9 +2,12 @@
 
 Environment: install from env.yml
 
+# Prepare
+Create "checkpoint" folder contain checkpoint file
+
 # Predict
 Input requiment:
- - Csv file of list image to predict, example 123.png
+ - path to image predict
 Output:
  
 call function from signboard_detect.py
