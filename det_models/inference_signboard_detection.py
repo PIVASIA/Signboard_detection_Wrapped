@@ -20,7 +20,7 @@ def compose(output, mask):
 
     for i in range(0, w):
         for j in range(0,h):
-            if (mask[i,j] == 1):
+            if (mask[i,j] > 0.5):
                 output[i,j] = 1
     return output
 
@@ -73,6 +73,7 @@ class POIDetectionTask(pl.LightningModule):
     
     def on_predict_end(self):
         image = Image.open(self.data_path).convert('RGBA')
+
         pred_boxes = self.pred_targets[0]
         pred_masks = self.pred_masks[0]
         pred_labels = self.pred_labels[0]
@@ -81,8 +82,5 @@ class POIDetectionTask(pl.LightningModule):
         self.output = np.zeros((height,width), dtype="uint8")
         for j in range(0,len(pred_masks)):
             mask = pred_masks[j]
-            mask = mask[0]
-            # if (mask[:,:] == 1):
-                # self.output[:,:] = 1 
-            self.output = compose(self.output, mask)
+            self.output = compose(self.output, mask[0])
         

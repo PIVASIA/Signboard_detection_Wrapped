@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 from pytorch_lightning import Trainer
 from det_models.model import POIDetection
 from datasets_signboard_detection.datamodule import POIDataModule
+import cv2
 
 def load_model(checkpoint_path):
     model = POIDetection.load_from_checkpoint(checkpoint_path=checkpoint_path)
