@@ -36,9 +36,7 @@ class POIDetectionTask(pl.LightningModule):
         self.pred_targets = []
         self.pred_masks = []
         self.pred_labels = []
-        self.labelizer = Labelizer()
         self.color_convert = Color_convert()
-        self.num_sticker = 0
 
     def forward(self, x):
         output = self.model(x)
@@ -67,20 +65,27 @@ class POIDetectionTask(pl.LightningModule):
             select_shape = [select_shape]
             select_masks = [select_masks]
             select_labels = [select_labels]
-            self.pred_targets = select_shape
-            self.pred_masks = select_masks
-            self.pred_labels = select_labels
+            self.pred_targets.append(select_shape)
+            self.pred_masks.append(select_masks)
+            self.pred_labels.append(select_labels)
     
     def on_predict_end(self):
-        image = Image.open(self.data_path).convert('RGBA')
+        list_img = os.listdir(self.data_path)
+        for i in range(0,len(list_img)):
+            image = Image.open(os.path.join(self.data_path,list_img[i])).convert('RGBA')
 
-        pred_boxes = self.pred_targets[0]
-        pred_masks = self.pred_masks[0]
-        pred_labels = self.pred_labels[0]
-    
-        width, height = image.size
-        self.output = np.zeros((height,width), dtype="uint8")
-        for j in range(0,len(pred_masks)):
-            mask = pred_masks[j]
-            self.output = compose(self.output, mask[0])
+            pred_boxes = self.pred_targets[i]
+            pred_masks = self.pred_masks[i]
+            pred_labels = self.pred_labels[i]
+
+            pred_boxes = pred_boxes[0]
+            pred_masks = pred_masks[0]
+            pred_labels = pred_labels[0]
+
+            width, height = image.size
+            outputs = np.zeros((height,width), dtype="uint8")
+            for j in range(0,len(pred_masks)):
+                mask = pred_masks[j]
+                outputs = compose(outputs, mask[0])
+            self.output.append(outputs)
         

@@ -3,11 +3,11 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 from datasets_signboard_detection.dataset import PoIDataset
 import datasets_signboard_detection.utils as utils
+import os
 
 
-
-def _get_name(filepath):
-    images = filepath
+def _get_list_img(filepath):
+    images = os.listdir(filepath)
     return images
 
 class POIDataModule(pl.LightningDataModule):
@@ -26,11 +26,13 @@ class POIDataModule(pl.LightningDataModule):
     def prepare_data(self):
         pass
     
-    def setup(self, stage="fit"):
+    def setup(self, stage="predict"):
         transform = [transforms.ToTensor()]
         test_transform = transforms.Compose(transform)
+        list_img = _get_list_img(self.data_path)
         if stage == "predict" or stage is None:
-            self.test_dataset = PoIDataset(self.data_path, 
+            self.test_dataset = PoIDataset(list_img, 
+                                           self.data_path,
                                            transforms=test_transform)
 
     def predict_dataloader(self):

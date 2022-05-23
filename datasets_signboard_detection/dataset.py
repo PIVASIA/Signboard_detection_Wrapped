@@ -1,6 +1,8 @@
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
+import os 
+
 class Labelizer():
     def __init__(self):
         super().__init__()
@@ -17,16 +19,19 @@ class Labelizer():
 
 class PoIDataset(Dataset):
     def __init__(self,
+                 list_img,
                  data_path,
                  transforms=None):
+        self.list_img = list_img
         self.data_path = data_path
         self.transforms = transforms
     
     def __len__(self):
-        return 1
+        return len(self.list_img)
     
     def __getitem__(self, idx):
-        image = Image.open(self.data_path).convert('RGB')
+        img_name = self.list_img[idx]
+        image = Image.open(os.path.join(self.data_path,img_name)).convert('RGB')
         target = {}
         if self.transforms is not None:
             image = self.transforms(image)
